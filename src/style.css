@@ -3,4 +3,5 @@
 
 
 .stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:17px}.stat-value{font-size:48px;font-weight:800;color:#68dfc5;margin-top:8px}.code{font-family:ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#68dfc5}.invite-form{margin-top:16px;max-width:480px}#otherOrgWrap[hidden]{display:none}@media(max-width:650px){.stats-grid{grid-template-columns:1fr}}
+#otherCityWrap[hidden]{display:none}
 
