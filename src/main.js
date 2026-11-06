@@ -97,7 +97,7 @@ async function submit(){
   <div class="field"><label for="concept">Концепция проекта</label><textarea id="concept" required minlength="30" maxlength="12000" placeholder="Проблема, аудитория, решение и отличие от существующих проектов"></textarea></div>
   <div class="field"><label for="technical">Техническое описание</label><textarea id="technical" required minlength="30" maxlength="12000" placeholder="Технология, реализация, прототип и результат. Не указывайте имена участников или команды: эксперт увидит этот текст."></textarea></div>
   <div class="field"><label for="features">Особенности проекта</label><textarea id="features" required minlength="10" maxlength="4000" placeholder="Что отличает проект"></textarea></div>
-  ${field('category','Направление','text',true,'maxlength="80"')}
+  <div class="field"><label for="category">Направление</label><select id="category" required><option value="">Выберите направление</option><option value="Ai Software">Ai Software</option><option value="Ai Media">Ai Media</option><option value="Ai Hardware">Ai Hardware</option></select></div>
   ${field('file','Файл проекта — PDF, DOCX, TXT, MD','file',false,'accept=".pdf,.docx,.txt,.md"')}
   <div class="notice">Перед отправкой подтвердите email по ссылке из письма. Эксперт видит только название, концепцию, особенности и техническое описание проекта.</div>
   <button class="btn primary" type="submit">Отправить и проанализировать</button></form></section>`;
