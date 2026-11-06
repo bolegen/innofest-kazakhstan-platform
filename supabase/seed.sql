@@ -1,0 +1,28 @@
+-- Verified public reporting only; missing years remain empty.
+insert into public.archive_projects(year,title,summary,category,place,source_url) values
+  (2021,'Digital Oner','Онлайн-курсы творческих навыков','Контент и медиа',1,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Ағайындылар','Анимационный и видеоконтент для детей с аутизмом и ДЦП','Контент и медиа',2,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Өткенсіз болашақ жоқ','Изучение исторических и крылатых выражений в современном формате','Контент и медиа',3,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'AII System','Безопасность и посещаемость учащихся с распознаванием лиц','Smart Qyzylorda',1,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'IT Аймақ','Террариум с датчиками влажности и температуры','Smart Qyzylorda',2,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'AR 262','Робот для выдачи антисептика и масок','Smart Qyzylorda',3,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'БАТ','Экологический видеоролик о защите Земли','Кино и видео',1,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Turan Production','Видео о вреде зависимости от ставок','Кино и видео',2,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Oner','Видео о насилии и суициде','Кино и видео',3,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Hexagon — Образовательная лига','Обучающая игра с соревнованиями по школьной программе и подготовкой к ЕНТ','IT',1,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'Kode Geass','Определение транспорта и контроль скорости','IT',2,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2021,'F4-1','Распознавание объектов с озвучиванием для людей с нарушением зрения','IT',3,'https://www.caravan.kz/news/innofest-qyzylorda-ot-idei-do-prototipa-za-24-chasa-801619/'),
+  (2022,'Red-yurt','Цифровой проект о культуре и истории Казахстана: сайт, медиа, библиотека и курсы','Контент и медиа',2,'https://tirshilik-tynysy.kz/kogam/24408-nnofest-qyzylorda-ideyalar-bayauyny-zhempazy-atandy.html'),
+  (2023,'Сұңқар Арал 2023','Описание в открытом источнике отсутствует','SmartCity',1,'https://fnn.kz/news/1240'),
+  (2023,'IDOS','Описание в открытом источнике отсутствует','SmartCity',2,'https://fnn.kz/news/1240'),
+  (2023,'Mavericks','Описание в открытом источнике отсутствует','SmartCity',3,'https://fnn.kz/news/1240'),
+  (2023,'3D history of Kazakhstan','История Казахстана в формате 3D','Контент и дизайн',1,'https://fnn.kz/news/1240'),
+  (2023,'Syr-lax','Описание в открытом источнике отсутствует','Контент и дизайн',2,'https://fnn.kz/news/1240'),
+  (2023,'Time Baty','Описание в открытом источнике отсутствует','Контент и дизайн',3,'https://fnn.kz/news/1240'),
+  (2023,'Basqa','Описание в открытом источнике отсутствует','Кино и видео',1,'https://fnn.kz/news/1240'),
+  (2023,'4G','Описание в открытом источнике отсутствует','Кино и видео',2,'https://fnn.kz/news/1240'),
+  (2023,'Dream','Описание в открытом источнике отсутствует','Кино и видео',3,'https://fnn.kz/news/1240'),
+  (2025,'Extrnos','Безопасная операционная система для мобильных телефонов','Software dev',1,'https://www.fnn.kz/kz/news/1479'),
+  (2025,'Қалдықтарды сұрыптаушы','Устройство для сортировки отходов','AI',1,'https://www.fnn.kz/kz/news/1479'),
+  (2025,'Қос аққу','Проект команды-победителя в номинации Movies & video','Movies & video',1,'https://www.fnn.kz/kz/news/1479')
+on conflict(year,title) do nothing;
