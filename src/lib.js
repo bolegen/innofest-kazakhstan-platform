@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { translateMessage } from './appearance.js';
+import { translateMessage, currentLanguage } from './appearance.js';
 import { unzipSync, strFromU8 } from 'fflate';
 
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
@@ -18,7 +18,7 @@ export function sourceUrl(value) {
 }
 export function date(value) {
   if (!value) return '';
-  try { return new Intl.DateTimeFormat('ru-RU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value)); }
+  try { return new Intl.DateTimeFormat(({kk:'kk-KZ',en:'en-US',ru:'ru-RU'})[currentLanguage()]||'ru-RU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value)); }
   catch { return String(value); }
 }
 export function toast(message, bad = false) {
