@@ -26,6 +26,28 @@ async function refreshAuth(){if(!configured){user=null;role='guest';profile=null
 function render(){view=(location.hash||'#overview').slice(1).split('?')[0]||'overview';const allowed=new Set(['overview','login','register','reset','dashboard','teams','submit','applications','review','admin','archive','profile']);if(!allowed.has(view))view='overview';if(!user&&['dashboard','teams','submit','applications','review','admin','archive','profile'].includes(view))view='login';if(user&&['login','register'].includes(view))view='profile';if(role!=='participant'&&['teams','submit','applications'].includes(view))view='overview';if(role!=='admin'&&['admin','archive'].includes(view))view='overview';if(role!=='expert'&&view==='review')view='overview';nav();({overview,login,register,reset,dashboard,teams,submit,applications,review,admin,archive,profile:profileView})[view]();applyTranslations()}
 function overview(){screen.innerHTML=`<div class="hero"><div><span class="eyebrow">INNOFEST Kazakhstan · платформа проектов</span><h1>Технологии начинаются <em>с вашей идеи</em></h1><p>Соберите команду, представьте проект и получите экспертную оценку. Платформа поможет сравнить идею с архивом прошлых проектов.</p><div class="row"><button class="btn primary" data-go="${user?(role==='participant'?'submit':role==='expert'?'review':role==='admin'?'admin':'profile'):'register'}">${user?(role==='participant'?'Подать проект':role==='expert'?'Открыть экспертизу':role==='admin'?'Открыть админ-панель':'Профиль'):'Зарегистрироваться'}</button><button class="btn" data-go="${user?(role==='participant'?'applications':'dashboard'):'login'}">${user?(role==='participant'?'Мои заявки':'Дашборд'):'Войти в кабинет'}</button></div></div><div class="hero-aside"><div class="label">Путь проекта</div><div class="number">01—04</div><p>Команда · Заявка · Анализ · Экспертиза</p></div></div><div class="cards"><div class="card"><div class="label">Участникам</div><h3>Команда и заявка</h3><p>Создайте команду из 2–5 участников и подайте описание проекта с файлом PDF, DOCX, TXT или MD.</p></div><div class="card"><div class="label">Экспертам</div><h3>Объективная оценка</h3><p>Оценивайте содержание проекта по пяти критериям без сведений о составе команды.</p></div><div class="card"><div class="label">Организаторам</div><h3>Управление проектами</h3><p>Работайте с заявками, статистикой, экспертными ролями и архивом проектов.</p></div></div>`;screen.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>location.hash=b.dataset.go)}
 function authShell(title,body){screen.innerHTML=`<section class="section auth-box"><div class="card"><span class="label">Аккаунт INNOFEST</span><h2>${title}</h2>${!configured?'<div class="notice error">Параметры Supabase не настроены.</div>':''}${body}</div></section>`}
+function showEmailConfirmation(){
+  const old=get('emailConfirmation');
+  old?.remove();
+  const overlay=document.createElement('div');
+  overlay.id='emailConfirmation';
+  overlay.className='dialog-overlay';
+  overlay.innerHTML=`<div class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" aria-describedby="confirmationText">
+    <span class="dialog-icon" aria-hidden="true">✉</span>
+    <h2 id="confirmationTitle">Подтвердите электронную почту</h2>
+    <p id="confirmationText">Мы отправили письмо для подтверждения аккаунта. Откройте почту и перейдите по ссылке в письме. После этого войдите на сайт.</p>
+    <p class="dialog-hint">Не видите письмо? Проверьте папку «Спам».</p>
+    <button class="btn primary" type="button" id="closeConfirmation">Понятно</button>
+  </div>`;
+  document.getElementById('app').append(overlay);
+  const close=()=>{overlay.remove();document.removeEventListener('keydown',onKey);get('email')?.focus()};
+  const onKey=e=>{if(e.key==='Escape')close()};
+  document.addEventListener('keydown',onKey);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+  overlay.querySelector('button').addEventListener('click',close);
+  applyTranslations();
+  overlay.querySelector('button').focus();
+}
 function login(){authShell('Вход',`<form id="authForm" class="form">${field('email','Электронная почта','email')}${field('password','Пароль','password')}<button class="btn primary" type="submit">Войти</button></form><p class="small">Нет аккаунта? <a href="#register">Зарегистрироваться</a> · <a href="#reset">Забыли пароль?</a></p>`);get('authForm').onsubmit=e=>{e.preventDefault();run(e.currentTarget,async()=>{unwrap(await supabase.auth.signInWithPassword({email:get('email').value.trim(),password:get('password').value}));location.hash='overview';await refreshAuth()})}}
 function register(){
   authShell('Регистрация',`<form id="authForm" class="form">
@@ -34,7 +56,6 @@ function register(){
     ${field('password','Пароль (минимум 8 символов)','password',true,'minlength="8"')}
     ${field('passwordConfirm','Повторите пароль','password',true,'minlength="8"')}
     ${organizationField()}
-    <div class="notice">После регистрации подтвердите email по ссылке из письма. До подтверждения отправить проект нельзя.</div>
     <button class="btn primary" type="submit">Зарегистрироваться</button></form>
     <p class="small">Уже зарегистрированы? <a href="#login">Войти</a></p>`);
   wireOrganization();
@@ -47,8 +68,9 @@ function register(){
         organization:selectedOrganization()
       }}
     }));
-    toast(data.session?'Аккаунт создан':'Проверьте почту и подтвердите email по ссылке из письма');
     location.hash=data.session?'profile':'login';await refreshAuth();
+    if(data.session)toast('Аккаунт создан');
+    else showEmailConfirmation();
   })}
 }
 function reset(){authShell('Восстановление пароля',`<form id="authForm" class="form">${field('email','Электронная почта','email')}<button class="btn primary" type="submit">Отправить ссылку</button></form>`);get('authForm').onsubmit=e=>{e.preventDefault();run(e.currentTarget,async()=>{unwrap(await supabase.auth.resetPasswordForEmail(get('email').value.trim(),{redirectTo:location.origin+'/#profile'}));toast('Если адрес зарегистрирован, письмо отправлено')})}}
