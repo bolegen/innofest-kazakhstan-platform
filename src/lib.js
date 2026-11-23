@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { translateMessage } from './appearance.js';
 import { unzipSync, strFromU8 } from 'fflate';
 
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
@@ -22,7 +23,7 @@ export function date(value) {
 }
 export function toast(message, bad = false) {
   const box = document.getElementById('toast');
-  box.textContent = message;
+  box.textContent = translateMessage(message);
   box.style.display = 'block';
   box.style.borderColor = bad ? '#ed91a0' : '#65dec5';
   window.clearTimeout(toast.timer);
@@ -70,4 +71,3 @@ export function fileMime(file) {
   if (name.endsWith('.md')) return 'text/markdown';
   return 'text/plain';
 }
-
