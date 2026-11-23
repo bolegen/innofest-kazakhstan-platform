@@ -45,7 +45,12 @@ export const currentLanguage=()=>language;
 function translateText(value){
   const exact=value.trim();
   const translated=translations[language]?.[exact];
-  return translated ? value.replace(exact,translated) : value;
+  if(translated)return value.replace(exact,translated);
+  if(language==='ru')return value;
+  for(const prefix of ['Участников:','Ожидает анализа','Анализ готов','На экспертизе','Одобрена','Отклонена','Оценка сохранена:','Импортировано строк:']){
+    if(exact.startsWith(prefix)&&translations[language]?.[prefix])return value.replace(prefix,translations[language][prefix]);
+  }
+  return value;
 }
 export const translateMessage=translateText;
 export function applyTranslations(){
