@@ -9,6 +9,7 @@ const multiSelect=(name,selected=[])=>`<div class="skill-picker" data-skill-pick
 const chosenSkills=(root,name)=>[...root.querySelectorAll(`[data-skill-picker="${name}"] input:checked`)].map(input=>input.value);
 const options=(values,selected='')=>values.map(x=>`<option value="${x}" ${x===selected?'selected':''}>${x}</option>`).join('');
 const setText=(element,text)=>{element.textContent=text};
+const applicationLabels={pending:'Ожидает ответа',accepted:'Отклик принят',declined:'Отклик отклонён'};
 
 export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,toast}){
   if(role!=='participant'){location.hash='overview';return}
@@ -26,14 +27,21 @@ export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,t
       </div>
       <div class="split builder-results"><div><h3>Ищу команду</h3><div id="candidateList" class="list"></div></div>
       <div><h3>Ищу разработчика</h3><div id="openingList" class="list"></div></div></div>
+      <div id="openingApplications" class="list"></div>
     </div></section>`;
-  const status=screen.querySelector('#builderStatus');
+  const root=screen.querySelector('.team-builder');
+  const status=root.querySelector('#builderStatus');
+  const refreshIfActive=()=>{
+    if(screen.contains(root))void teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,toast});
+  };
   try{
-    const [teamsResult,profilesResult,openingsResult]=await Promise.all([
+    const [teamsResult,profilesResult,openingsResult,applicationsResult]=await Promise.all([
       myTeams(),
       supabase.from('team_builder_profiles').select('user_id,display_name,desired_role,skills,bio,visible').order('updated_at',{ascending:false}).limit(200),
-      supabase.rpc('get_team_builder_openings')
+      supabase.rpc('get_team_builder_openings'),
+      supabase.rpc('get_team_opening_applications')
     ]);
+    if(!screen.contains(root))return;
     if(profilesResult.error)throw profilesResult.error;
     if(openingsResult.error)throw openingsResult.error;
     const teams=teamsResult||[];
@@ -42,6 +50,45 @@ export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,t
     const myProfile=(profilesResult.data||[]).find(x=>x.user_id===uid());
     let candidates=(profilesResult.data||[]).filter(x=>x.visible&&x.user_id!==uid());
     let openings=openingsResult.data||[];
+    const applications=applicationsResult.data||[];
+    const personal=applications.filter(a=>!a.can_review);
+    const incoming=applications.filter(a=>a.can_review);
+    const appliedOpenings=new Set(personal.map(a=>a.opening_id));
+    const applicationsSection=root.querySelector('#openingApplications');
+    const applicationCards=(rows,review=false)=>rows.length
+      ?rows.map(a=>`<article class="project-card">
+        <span class="tag">${esc(applicationLabels[a.status]||'')}</span>
+        ${a.opening_status==='closed'?'<span class="tag">Вакансия закрыта</span>':''}
+        <h4>${esc(a.opening_title)}</h4><p class="small">${esc(a.team_name)}</p>
+        ${review?`<p><strong>${esc(a.applicant_name||'Участник')}</strong></p>`:''}
+        ${a.message?`<p>${esc(a.message)}</p>`:''}
+        ${review&&a.status==='pending'?`<div class="row">
+          ${a.opening_status==='open'?`<button class="btn primary small" type="button" data-decision="accept" data-application="${esc(a.id)}">Принять кандидата</button>`:''}
+          <button class="btn small" type="button" data-decision="decline" data-application="${esc(a.id)}">Отклонить отклик</button>
+        </div>`:''}</article>`).join('')
+      :'<p class="muted">Откликов пока нет.</p>';
+    if(applicationsResult.error){
+      applicationsSection.innerHTML='<div class="notice">Отклики на вакансии временно недоступны.</div>';
+    }else{
+      applicationsSection.innerHTML=`<div class="split">
+        <section><h3>Мои отклики</h3><div class="list">${applicationCards(personal)}</div></section>
+        ${teams.some(t=>t.owner_id===uid())?`<section><h3>Отклики кандидатов</h3><div class="list">${applicationCards(incoming,true)}</div></section>`:''}
+      </div>`;
+    }
+    const openingAction=o=>{
+      if(teams.some(t=>t.team_id===o.team_id&&t.owner_id===uid())){
+        return `<button class="btn small" type="button" data-close-opening="${esc(o.id)}">Закрыть вакансию</button>`;
+      }
+      if(appliedOpenings.has(o.id))return '<p class="muted small">Отклик отправлен</p>';
+      if(hasTeam||applicationsResult.error)return '';
+      return `<details><summary>Откликнуться</summary>
+        <form class="form" data-apply-opening="${esc(o.id)}">
+          <div class="field"><label>Сообщение капитану<textarea name="message" maxlength="400" placeholder="По желанию"></textarea></label></div>
+          <p class="small muted">Ваше имя и сообщение увидит капитан команды.</p>
+          <p class="small muted">Если капитан примет отклик, вы войдёте в команду.</p>
+          <button class="btn primary small" type="submit">Отправить отклик</button>
+        </form></details>`;
+    };
     const candidateEditor=screen.querySelector('#candidateEditor');
     candidateEditor.innerHTML=hasTeam
       ?'<h3>Моя анкета</h3><p class="muted">Вы уже состоите в команде. Анкета скрыта из поиска.</p>'
@@ -75,7 +122,7 @@ export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,t
       const matchingOpenings=openings.filter(o=>(!skill||o.skills.includes(skill))&&(!desiredRole||o.desired_role===desiredRole));
       screen.querySelector('#openingList').innerHTML=matchingOpenings.length
         ?matchingOpenings.map(o=>`<article class="project-card"><span class="tag">${esc(o.desired_role)}</span><h3>${esc(o.title)}</h3><p><strong>${esc(o.team_name)}</strong> · ${o.member_count}/5</p><p class="small">${o.skills.map(esc).join(' · ')}</p><p>${esc(o.description)}</p>
-          ${teams.some(t=>t.team_id===o.team_id&&t.owner_id===uid())?`<button class="btn small" type="button" data-close-opening="${o.id}">Закрыть вакансию</button>`:''}</article>`).join('')
+          ${openingAction(o)}</article>`).join('')
         :'<div class="notice">Подходящих вакансий пока нет.</div>';
       screen.querySelectorAll('[data-invite]').forEach(button=>button.onclick=async()=>{
         button.disabled=true;
@@ -90,11 +137,33 @@ export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,t
         try{
           unwrap(await supabase.from('team_openings').update({status:'closed'}).eq('id',button.dataset.closeOpening));
           openings=openings.filter(o=>o.id!==button.dataset.closeOpening);
-          toast('Вакансия закрыта');filter();
+          toast('Вакансия закрыта');refreshIfActive();
+        }catch(error){toast(error.message,true);button.disabled=false}
+      });
+      root.querySelectorAll('[data-apply-opening]').forEach(form=>form.onsubmit=async event=>{
+        event.preventDefault();
+        const button=form.querySelector('[type=submit]');button.disabled=true;
+        try{
+          unwrap(await supabase.rpc('apply_to_team_opening',{
+            p_opening_id:form.dataset.applyOpening,
+            p_message:form.elements.message.value.trim()
+          }));
+          toast('Отклик отправлен');refreshIfActive();
         }catch(error){toast(error.message,true);button.disabled=false}
       });
       applyTranslations();
     };
+    root.querySelectorAll('[data-application]').forEach(button=>button.onclick=async()=>{
+      const accept=button.dataset.decision==='accept';
+      const actions=button.closest('.row').querySelectorAll('button');
+      actions.forEach(b=>b.disabled=true);
+      try{
+        unwrap(await supabase.rpc('decide_team_opening_application',{
+          p_application_id:button.dataset.application,p_accept:accept
+        }));
+        toast(accept?'Отклик принят':'Отклик отклонён');refreshIfActive();
+      }catch(error){toast(error.message,true);actions.forEach(b=>b.disabled=false)}
+    });
     screen.querySelector('#builderSkill').onchange=filter;
     screen.querySelector('#builderRole').onchange=filter;
     screen.querySelector('#candidateForm')?.addEventListener('submit',async event=>{
@@ -142,3 +211,4 @@ export async function teamBuilder({screen,supabase,uid,role,myTeams,esc,unwrap,t
   }
   applyTranslations();
 }
+
