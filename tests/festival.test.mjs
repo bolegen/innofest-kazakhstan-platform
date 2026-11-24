@@ -16,6 +16,11 @@ test('fallback understands three languages and does not invent unknowns', () => 
   assert.deepEqual(findTopics('Во сколько начинается регистрация?'), ['dates']);
   assert.deepEqual(findTopics('Фестиваль қай жерде өтеді?'), ['venue']);
   assert.deepEqual(findTopics('How do I submit the project?'), ['projects']);
+  assert.deepEqual(findTopics('Где будет сегодняшнее роудшоу?'), ['roadshow']);
+  assert.deepEqual(findTopics('Roadshow қашан?'), ['roadshow']);
+  assert.deepEqual(findTopics('What time is the road show?'), ['roadshow']);
+  assert.deepEqual(findTopics('Қай күні өтеді?'), ['dates']);
+  assert.deepEqual(findTopics('Қатысу үшін не істеу керек?'), ['signup']);
   assert.deepEqual(findTopics('Какая будет погода?'), []);
   assert.equal(hasPersonalData('04.12.2026'), false);
   assert.equal(hasPersonalData('abc@example.invalid'), true);

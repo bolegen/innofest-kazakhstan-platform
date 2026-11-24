@@ -1,5 +1,6 @@
 export const START_ISO = '2026-12-04T09:00:00+05:00';
 export const OFFICIAL_URL = 'https://www.innofest.kz/';
+export const ROADSHOW_NOTICE = "https://www.gov.kz/org/cifrovizaciya-kyzylorda/press/events/details/50030?lang=kk";
 export const MAP_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Центр искусств Өнер орталығы, Кызылорда, Султана Бейбарса 10А');
 
 export function countdownAt(now = Date.now()) {
@@ -10,11 +11,18 @@ export function countdownAt(now = Date.now()) {
 }
 
 export const topics = {
+  roadshow: {
+    ru: ['Роудшоу InnoFest', 'Встреча роудшоу в Кызылорде: 25 ноября 2026 года в 17:00 (UTC+5), Kyzylorda Hub. Это отдельная встреча, не декабрьский фестиваль.'],
+    kk: ['InnoFest роудшоуы', 'Қызылордадағы роудшоу кездесуі: 2026 жылғы 25 қараша, 17:00 (UTC+5), Kyzylorda Hub. Бұл желтоқсандағы фестивальден бөлек кездесу.'],
+    en: ['InnoFest roadshow', 'The Kyzylorda roadshow meeting is listed for November 25, 2026 at 17:00 (UTC+5), at Kyzylorda Hub. It is separate from the December festival.'],
+    cues: /road[\s-]*show|ро[уү](?:д|т)[\s-]*шоу/iu,
+    url: ROADSHOW_NOTICE,
+  },
   dates: {
     ru: ['Когда фестиваль?', 'Фестиваль пройдёт 4–5 декабря 2026 года. 4 декабря регистрация на площадке начнётся в 09:00, церемония открытия — в 11:00. Время Кызылорды (UTC+5).'],
     kk: ['Фестиваль қашан өтеді?', 'Фестиваль 2026 жылғы 4–5 желтоқсанда өтеді. 4 желтоқсанда қатысушыларды тіркеу 09:00-де, ашылу салтанаты 11:00-де басталады. Қызылорда уақыты (UTC+5).'],
     en: ['When is the festival?', 'The festival runs on December 4–5, 2026. On December 4, on-site check-in starts at 09:00 and the opening ceremony starts at 11:00, Kyzylorda time (UTC+5).'],
-    cues: /\b(?:when|schedule|timing|december|date|start|time|opening|ceremony|program)\b|когда|во сколько|дек\p{L}*|числ|програм|расписан|церемон|открыти|начал|начн|начина|старт|врем|дат|қашан|желтоқсан|бастал|уақыт|кесте|ашыл/iu,
+    cues: /\b(?:when|schedule|timing|december|date|start|time|opening|ceremony|program)\b|когда|во сколько|дек\p{L}*|числ|програм|расписан|церемон|открыти|начал|начн|начина|старт|врем|дат|қашан|желтоқсан|бастал|уақыт|кесте|ашыл|қай күні|қай күнге/iu,
     url: OFFICIAL_URL,
   },
   venue: {
@@ -35,7 +43,7 @@ export const topics = {
     ru: ['Как зарегистрироваться?', 'На этой платформе откройте «Регистрация», создайте аккаунт и подтвердите почту. Чтобы подать проект на фестиваль, проверьте условия и сроки на официальном сайте.'],
     kk: ['Қалай тіркелуге болады?', 'Осы платформада «Тіркелу» бөлімін ашып, аккаунт құрыңыз және поштаңызды растаңыз. Фестивальге жоба ұсыну үшін ресми сайттағы талаптар мен мерзімдерді тексеріңіз.'],
     en: ['How do I sign up?', 'On this platform, select Sign up, create an account and verify your email. For festival eligibility and deadlines, check the official website.'],
-    cues: /\b(?:register|registration|sign\s?up|account|email|verify|deadline)\b|регистр|аккаунт|подтверд|почт|дедлайн|срок|тірке|раста|пошта|мерзім/iu,
+    cues: /\b(?:register|registration|sign\s?up|account|email|verify|deadline)\b|регистр|аккаунт|подтверд|почт|дедлайн|срок|тірке|раста|пошта|мерзім|қатысу үшін|қалай қатыс/iu,
     url: OFFICIAL_URL,
   },
   teams: {
@@ -63,6 +71,8 @@ export const topics = {
 
 export function findTopics(question) {
   const query = question.normalize('NFKC').trim();
+  // Never conflate a roadshow meeting with the final's dates or venue.
+  if (topics.roadshow.cues.test(query)) return ['roadshow'];
   const hits = Object.keys(topics).filter(id => topics[id].cues.test(query));
   // “When does registration start?” refers to the published schedule, not account creation.
   if (hits.includes('dates') && hits.includes('signup') && !/срок|дедлайн|deadline|мерзім/iu.test(query)) {

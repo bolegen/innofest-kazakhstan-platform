@@ -67,7 +67,7 @@ export function festivalHtml(language) {
   <details class="festival-assistant card">
     <summary>${t.assistant}</summary>
     <p>${t.hint}</p>
-    <div class="row festival-topics">${Object.entries(topics).map(([id, topic]) => `<button class="btn small" type="button" data-topic="${id}">${topic[l][0]}</button>`).join('')}</div>
+    <div class="row festival-topics">${Object.entries(topics).filter(([id]) => id !== 'roadshow').map(([id, topic]) => `<button class="btn small" type="button" data-topic="${id}">${topic[l][0]}</button>`).join('')}</div>
     <form class="festival-form">
       <div class="field"><label for="festival-question">${t.question}</label>
         <input id="festival-question" type="text" maxlength="300" required autocomplete="off">
@@ -178,7 +178,7 @@ export function mountFestival(root, language, role) {
       return;
     }
     const local = findTopics(question);
-    if (consentLabel.hidden || !consent.checked) {
+    if (local.includes('roadshow') || consentLabel.hidden || !consent.checked) {
       show(local);
       return;
     }
