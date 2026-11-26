@@ -22,13 +22,13 @@ export const topics = {
     ru: ['Когда фестиваль?', 'Фестиваль пройдёт 4–5 декабря 2026 года. 4 декабря регистрация на площадке начнётся в 09:00, церемония открытия — в 11:00. Время Кызылорды (UTC+5).'],
     kk: ['Фестиваль қашан өтеді?', 'Фестиваль 2026 жылғы 4–5 желтоқсанда өтеді. 4 желтоқсанда қатысушыларды тіркеу 09:00-де, ашылу салтанаты 11:00-де басталады. Қызылорда уақыты (UTC+5).'],
     en: ['When is the festival?', 'The festival runs on December 4–5, 2026. On December 4, on-site check-in starts at 09:00 and the opening ceremony starts at 11:00, Kyzylorda time (UTC+5).'],
-    cues: /\b(?:when|schedule|timing|december|date|start|time|opening|ceremony|program)\b|когда|во сколько|дек\p{L}*|числ|програм|расписан|церемон|открыти|начал|начн|начина|старт|врем|дат|қашан|желтоқсан|бастал|уақыт|кесте|ашыл|қай күні|қай күнге/iu,
+    cues: /\b(?:when|schedule|timing|december|date|start|time|opening|ceremony|program)\b|когда|во сколько|дек\p{L}*|числ|програм|расписан|церемон|открыти|начал|начн|начина|старт|врем|(?:^|[^\p{L}])дат(?:а|ы|у|е|ой|ами)?(?=$|[^\p{L}])|қашан|желтоқсан|бастал|уақыт|кесте|ашыл|қай күні|қай күнге/iu,
     url: OFFICIAL_URL,
   },
   venue: {
-    ru: ['Где проходит фестиваль?', 'г. Кызылорда, Центр искусств (Өнер орталығы).'],
-    kk: ['Фестиваль қай жерде өтеді?', 'Қызылорда қаласы, Өнер орталығы.'],
-    en: ['Where is the festival?', 'Center for the Arts (Өнер орталығы), Kyzylorda.'],
+    ru: ['Где проходит фестиваль?', 'г. Кызылорда, Центр искусств (Өнер орталығы). Здесь 4 декабря проходят регистрация на площадке и церемония открытия.'],
+    kk: ['Фестиваль қай жерде өтеді?', 'Қызылорда қаласы, Өнер орталығы. 4 желтоқсанда қатысушыларды тіркеу мен ашылу салтанаты осы жерде өтеді.'],
+    en: ['Where is the festival?', 'Center for the Arts (Өнер орталығы), Kyzylorda. On-site check-in and the opening ceremony take place here on December 4.'],
     cues: /\b(?:where|address|location|venue|directions|map)\b|где|куда|адрес|добра|доех|площадк|место|карт|қайда|қай жерде|қалай бар|мекенжай|өтетін жер|қай қала/iu,
     url: MAP_URL,
   },
@@ -60,6 +60,24 @@ export const topics = {
     cues: /\b(?:submission|submit|upload|application|attach)\b|подать|заявк|отправить проект|прикреп|файл|өтінім|жоба ұсын|жүкте|тірке\p{L}* файл/iu,
     url: '#submit',
   },
+  deadline: {
+    ru: ['До какого числа принимают заявки?', 'У меня нет подтверждённого срока подачи заявок на фестиваль. Проверьте сроки на официальном сайте InnoFest. Регистрация на площадке 4 декабря в 09:00 не означает, что до этого времени принимают заявки.'],
+    kk: ['Өтінімдер қашанға дейін қабылданады?', 'Фестивальге өтінім қабылдаудың нақты мерзімі расталмаған. Мерзімді InnoFest ресми сайтынан тексеріңіз. 4 желтоқсан күні сағат 09:00-де өтетін тіркеу өтінім қабылдау мерзімі емес.'],
+    en: ['When is the application deadline?', 'I don’t have a confirmed festival application deadline. Check the official InnoFest website. On-site check-in at 09:00 on December 4 is not an application cutoff.'],
+    url: OFFICIAL_URL,
+  },
+  trackVenue: {
+    ru: ['Где проходит мой трек?', '4 декабря регистрация на площадке и открытие проходят в Центре искусств (Өнер орталығы). Это не подтверждает место проведения отдельного трека. Проверьте площадки и обновления в программе организатора.'],
+    kk: ['Бағытым қай жерде өтеді?', '4 желтоқсанда қатысушыларды тіркеу мен ашылу салтанаты Өнер орталығында өтеді. Бұл әр бағыттың өтетін орны сол жерде дегенді білдірмейді. Өтетін орындар мен өзгерістерді ресми бағдарламадан тексеріңіз.'],
+    en: ['Where is my track?', 'On December 4, on-site check-in and the opening ceremony are at the Center for the Arts (Өнер орталығы). That doesn’t confirm where each track meets. Check the organizer’s program for venue updates.'],
+    url: OFFICIAL_URL,
+  },
+  admission: {
+    ru: ['Вход бесплатный?', 'По объявлению управления цифровых технологий Кызылординской области, вход бесплатный. Если вы идёте как зритель, уточните у организаторов, нужна ли отдельная регистрация.'],
+    kk: ['Кіру тегін бе?', 'Қызылорда облысының цифрлық технологиялар басқармасының хабарландыруына сәйкес, кіру тегін. Көрермен ретінде барсаңыз, бөлек тіркелу қажет пе екенін ұйымдастырушылардан нақтылаңыз.'],
+    en: ['Is admission free?', 'The Kyzylorda regional digital technologies department lists free admission. If you’re attending as a spectator, check with the organizers about any separate registration.'],
+    url: 'https://www.gov.kz/org/cifrovizaciya-kyzylorda/press/events/details/49761?lang=kk',
+  },
   prizes: {
     ru: ['Какой призовой фонд?', 'Организаторы объявили призовой фонд 6 000 000 тенге и образовательные гранты.'],
     kk: ['Жүлде қоры қанша?', 'Ұйымдастырушылар 6 000 000 теңге жүлде қорын және білім гранттарын жариялады.'],
@@ -69,11 +87,25 @@ export const topics = {
   },
 };
 
+// Specific event logistics take precedence over generic platform instructions.
+const deadlineCue = /\b(?:deadline|cut[ -]?off|by when|until when|last day|when does .{0,45} close)\b|до (?:какого|когда|какой даты)|крайний срок|дедлайн|срок.{0,30}(?:подач|заяв|регистр)|закроется|заканчива|аяқтал|соңғы (?:күн|мерзім)|қай күнге дейін|қашанға дейін/iu;
+const applicationCue = /\b(?:applications?|apply|submission|submit|regist\w*|sign[ -]?up)\b|подач|подать|заявк|регистр|өтінім|тіркел|қатысу/iu;
+const namedTrack = /\b(?:hardware|software|media|video|track)\b|трек|направлен|бағыт/iu;
+const admissionCue = /\b(?:admission|entry fee|tickets?|free entry|entry free|free to attend|spectators?|observers?)\b|билет|вход|зрител|кіру|көрермен/iu;
+
+export function priorityTopic(question) {
+  if (topics.roadshow.cues.test(question)) return 'roadshow';
+  if (!/\b(?:this platform|my account)\b|на этой платформе|в (?:личном )?кабинете|осы платформада|жеке кабинет/iu.test(question) && deadlineCue.test(question) && (applicationCue.test(question) || /deadline|дедлайн|соңғы мерзім/iu.test(question))) return 'deadline';
+  if (topics.venue.cues.test(question) && namedTrack.test(question)) return 'trackVenue';
+  if (admissionCue.test(question) && !/\b(?:account|log[ -]?in|sign[ -]?in)\b|вход в (?:аккаунт|кабинет|систему)|аккаунт|жеке кабинет/iu.test(question)) return 'admission';
+  return null;
+}
+
 export function findTopics(question) {
   const query = question.normalize('NFKC').trim();
-  // Never conflate a roadshow meeting with the final's dates or venue.
-  if (topics.roadshow.cues.test(query)) return ['roadshow'];
-  const hits = Object.keys(topics).filter(id => topics[id].cues.test(query));
+  const priority = priorityTopic(query);
+  if (priority) return [priority];
+  const hits = Object.keys(topics).filter(id => topics[id].cues?.test(query));
   // “When does registration start?” refers to the published schedule, not account creation.
   if (hits.includes('dates') && hits.includes('signup') && !/срок|дедлайн|deadline|мерзім/iu.test(query)) {
     return hits.filter(id => id !== 'signup').slice(0, 3);

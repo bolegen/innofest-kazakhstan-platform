@@ -67,3 +67,21 @@ test('optional server assist is off by default, bounds inputs, and returns only 
   fetch.mock.mockImplementation(async () => new Response('failure', { status: 500 }));
   assert.equal((await handler(question('Где фестиваль?'))).status, 503);
 });
+
+test('explicit event logistics do not lead visitors into the platform login', () => {
+  for (const query of [
+    'До какого числа можно подать заявку на фестиваль?',
+    'Фестивальге өтінім қабылдау қашан аяқталады?',
+    'What is the festival registration deadline?',
+    'When does festival registration close?',
+  ]) assert.deepEqual(findTopics(query), ['deadline'], query);
+  for (const query of ['Где будет трек AI Hardware?', 'AI Hardware бағыты қай жерде өтеді?', 'Where is the AI Hardware track?']) {
+    assert.deepEqual(findTopics(query), ['trackVenue'], query);
+  }
+  for (const query of ['Вход бесплатный?', 'Фестивальге кіру тегін бе?', 'Is admission free?']) {
+    assert.deepEqual(findTopics(query), ['admission'], query);
+  }
+  assert.deepEqual(findTopics('Как подать проект на этой платформе?'), ['projects']);
+  assert.deepEqual(findTopics('Где будет сегодняшнее роудшоу?'), ['roadshow']);
+  assert.deepEqual(findTopics('Во сколько начинается регистрация?'), ['dates']);
+});

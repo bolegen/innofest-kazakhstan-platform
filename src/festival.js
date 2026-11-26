@@ -1,5 +1,5 @@
 import './festival.css';
-import { countdownAt, findTopics, hasPersonalData, MAP_URL, OFFICIAL_URL, START_ISO, topics } from './festival-data.mjs';
+import { countdownAt, findTopics, hasPersonalData, priorityTopic, MAP_URL, OFFICIAL_URL, START_ISO, topics } from './festival-data.mjs';
 
 const words = {
   ru: {
@@ -178,7 +178,7 @@ export function mountFestival(root, language, role) {
       return;
     }
     const local = findTopics(question);
-    if (local.includes('roadshow') || consentLabel.hidden || !consent.checked) {
+    if (priorityTopic(question) || consentLabel.hidden || !consent.checked) {
       show(local);
       return;
     }
